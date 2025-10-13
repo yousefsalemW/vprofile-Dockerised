@@ -5,10 +5,10 @@ metadata:
   labels:
     app: vprodb
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: vprodb
-  replicas: 1
   template:
     metadata:
       labels:
@@ -17,32 +17,29 @@ spec:
       containers:
       - name: vprodb
         image: 3booda24/vprofiledb
-          #args:
-          #- "--ignore-db-dir"
-          #- "lost+found"
-        volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: vpro-db-data
         ports:
         - name: vprodb-port
           containerPort: 3306
         env:
-         - name: MYSQL_ROOT_PASSWORD
-           valueFrom:
-             secretKeyRef:
-               name: app-secret
-               key: db-pass
-      volumes:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: db-pass
+        volumeMounts:
         - name: vpro-db-data
-          # This AWS EBS volume must already exist.
-          awsElasticBlockStore:
-             volumeID: MentiondVoumeID
-             fsType: ext4
+          mountPath: /var/lib/mysql
 
       initContainers:
-        - name: busybox
-          image: busybox:latest
-          args: ["rm", "-rf", "/var/lib/mysql/lost+found"]
-          volumeMounts:
-            - name: vpro-db-data
-              mountPath: /var/lib/mysql
+      - name: busybox
+        image: busybox:latest
+        args: ["rm", "-rf", "/var/lib/mysql/lost+found"]
+        volumeMounts:
+        - name: vpro-db-data
+          mountPath: /var/lib/mysql
+
+      volumes:
+      - name: vpro-db-data
+        hostPath:
+          path: /mnt/data/mysql
+          type: DirectoryOrCreate
