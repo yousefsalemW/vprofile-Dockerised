@@ -1,0 +1,27 @@
+# Secrets
+.env
+*.pem
+*.key
+.aws/
+
+# Git
+.git
+.github/
+
+# Maven build output
+target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.settings/
+.project
+.classpath
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
